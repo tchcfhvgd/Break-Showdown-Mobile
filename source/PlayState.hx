@@ -4,7 +4,6 @@ import Shaders.FisheyeShader;
 import Shaders.SimpleGlitchShader;
 import Shaders.SimpleGlitchEffect;
 import Shaders.FisheyeEffect;
-import hxcodec.VideoSprite;
 import flixel.util.FlxBitmapDataUtil;
 import flixel.graphics.FlxGraphic;
 #if desktop
@@ -78,9 +77,10 @@ import sys.io.File;
 #end
 
 #if VIDEOS_ALLOWED
-#if (hxCodec >= "2.6.1") import hxcodec.VideoHandler as MP4Handler;
-#elseif (hxCodec == "2.6.0") import VideoHandler as MP4Handler;
-#else import vlc.MP4Handler; #end
+#if hxvlc
+import hxvlc.flixel.*;
+import hxvlc.util.*;
+#end
 #end
 
 using StringTools;
@@ -1147,7 +1147,7 @@ class PlayState extends MusicBeatState
 	}
 
 	#if LUA_ALLOWED
-	public function initLuaShader(name:String, ?glslVersion:Int = 120)
+	public function initLuaShader(name:String, ?glslVersion:Int = 100)
 	{
 		if(!ClientPrefs.shaders) return false;
 
@@ -1354,13 +1354,16 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		var video:MP4Handler = new MP4Handler();
-		video.playVideo(filepath);
-		video.finishCallback = function()
+		var video:FlxVideo = new FlxVideo();
+		video.load(filepath);
+		video.play();
+		video.onEndReached.add(function()
 		{
+			video.dispose();
 			startAndEnd();
 			return;
-		}
+		}, true);
+
 		#else
 		FlxG.log.warn('Platform not supported!');
 		startAndEnd();

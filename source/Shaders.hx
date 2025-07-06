@@ -73,8 +73,8 @@ class BlurShader extends FlxShader
         uniform float blurAmount;
 
         vec3 draw(vec2 uv) {
-            return texture(bitmap,vec2(uv.x,1.-uv.y)).rgb;   
-            //return texture(iChannel0,uv).rgb;  
+            return texture2D(bitmap,vec2(uv.x,1.-uv.y)).rgb;   
+            //return texture2D(iChannel0,uv).rgb;  
         }
         
         float grid(float var, float size) {
